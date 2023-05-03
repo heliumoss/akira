@@ -47,4 +47,4 @@ Contributions to Akira are welcome! To contribute, fork this repository, make yo
 
 ## License
 
-Akira is licensed under the MIT license. See [LICENSE](https://github.com/kttyoss/akira/blob/master/LICENSE) for more information.
+Akira is licensed under the GNU General Public License v3.0. See [LICENSE](https://github.com/kttyoss/akira/blob/master/LICENSE) for more information.
