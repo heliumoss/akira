@@ -1,6 +1,6 @@
 ![Akira header](https://cdn.bone.lol/images/ktty/Akira.png)
 ## Akira - The simple image processor
-Akira is a simple image processor that takes a single HTTP POST request with two form data inputs - size and image - and returns an array of images in those sizes in Base64 format.
+Akira is a simple image processor that takes a single HTTP POST request with two form data inputs - size and image - and returns an array of images in those sizes in Base64 format. This will be the backbone of the ktty Kanvas service.
 
 ## Installation
 Installing Akira is simple! Simply clone the repository and run `docker build` then run.
