@@ -1,6 +1,6 @@
-![Akira header](https://cdn.bone.lol/images/ktty/Akira.jpg)
+![Akira header](https://cdn.bone.lol/images/ktty/Akira.png)
 ## Akira - The simple image processor
-Akira is a simple image processor that takes a single HTTP POST request with two form data inputs - size and image - and returns an array of images in those sizes in Base64 format.
+Akira is a simple image processor that takes a single HTTP POST request with two form data inputs - size and image - and returns an array of images in those sizes in Base64 format. This will be the backbone of the ktty Kanvas service.
 
 ## Installation
 Installing Akira is simple! Simply clone the repository and run `docker build` then run.
@@ -41,4 +41,4 @@ Contributions to Akira are welcome! To contribute, fork this repository, make yo
 
 ## License
 
-Akira is licensed under the MIT license. See [LICENSE](https://github.com/kttyoss/akira/blob/master/LICENSE) for more information.
+Akira is licensed under the GNU General Public License v3.0. See [LICENSE](https://github.com/kttyoss/akira/blob/master/LICENSE) for more information.
