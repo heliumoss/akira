@@ -22,17 +22,38 @@ func processImage(byteContainer []byte, size string) (Image, error) {
 
 	image := bimg.NewImage(byteContainer)
 
-	_, err = image.Convert(bimg.JPEG)
+	imageSize, err := image.Size()
 	if err != nil {
 		return Image{}, err
 	}
 
-	resized, err := image.Resize(width, height)
-	if err != nil {
-		return Image{}, err
+	if imageSize.Width >= width || imageSize.Height >= height {
+		_, err = image.Convert(bimg.JPEG)
+		if err != nil {
+			return Image{}, err
+		}
+
+		resized, err := image.Resize(width, height)
+		if err != nil {
+			return Image{}, err
+		}
+
+		encoded := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(resized))
+
+		return Image{Size: size, Base64: encoded}, nil
+	} else {
+		_, err = image.Convert(bimg.JPEG)
+		if err != nil {
+			return Image{}, err
+		}
+
+		resized, err := image.Enlarge(width, height)
+		if err != nil {
+			return Image{}, err
+		}
+
+		encoded := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(resized))
+
+		return Image{Size: size, Base64: encoded}, nil
 	}
-
-	encoded := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(resized))
-
-	return Image{Size: size, Base64: encoded}, nil
 }
