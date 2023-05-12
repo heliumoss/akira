@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -99,6 +100,25 @@ func HandleImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	quality := 100
+
+	if r.PostForm.Has("quality") {
+		conv, err := strconv.Atoi(r.PostFormValue("quality"))
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(AverageResponse{Message: "Quality must be a number.", Error: true})
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if conv > 100 || conv < 0 {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(AverageResponse{Message: "Quality must be between 0 and 100.", Error: true})
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		quality = conv
+	}
+
 	// size is a string formatted like this: 64x64;128x128;256x256;512x512;1024x1024.
 	// we need to split this into an array of strings.
 
@@ -133,8 +153,15 @@ func HandleImage(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < poolSize; i++ {
 		go func() {
 			for size := range jobs {
+				if size == "" {
+					results <- Image{
+						Size:   "",
+						Base64: "",
+					}
+					continue
+				}
 				start := time.Now()
-				img, err := processImage(byteContainer, size)
+				img, err := processImage(byteContainer, size, quality)
 				if err != nil {
 					log.Println(err)
 					results <- img
@@ -156,10 +183,7 @@ func HandleImage(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(sizes); i++ {
 		img := <-results
 		if img.Base64 == "" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(AverageResponse{Message: "Something went wrong while trying to process the image.", Error: true})
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+			continue
 		}
 		images = append(images, img)
 	}
