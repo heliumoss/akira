@@ -18,9 +18,9 @@ docker run -d -p 8000:8000 embedbblz/akira
 ```
 
 ## Usage
-To use Akira, send a POST request to the `/resize` endpoint with `size` and `image` form data inputs. The size accepts multiple parameters and is formatted with a `;` in between each size. 
+To use Akira, send a POST request to the `/resize` endpoint with `size` and `image` and the optional `quality` form data inputs. The size accepts multiple parameters and is formatted with a `;` in between each size. 
 ```bash
-curl -X POST -F 'size=64x64;128x128' -F 'image=@/path/to/image.jpg' http://localhost:8000/resize
+curl -X POST -F 'size=64x64;128x128' -F 'image=@/path/to/image.jpg' http://localhost:8000/resize -F "quality=85"
 ```
 
 Akira will return a JSON response that includes an array of images with their size and the image encoded as a base64 string.
