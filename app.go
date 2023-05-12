@@ -126,28 +126,43 @@ func HandleImage(w http.ResponseWriter, r *http.Request) {
 	// loop through the array of sizes and resize the image for each size. preferably using goroutines.
 	// also create an array to hold these images.
 
-	var images []Image
-	ch := make(chan Image, len(sizes))
+	poolSize := 5
+	jobs := make(chan string, len(sizes))
+	results := make(chan Image, len(sizes))
+
+	for i := 0; i < poolSize; i++ {
+		go func() {
+			for size := range jobs {
+				start := time.Now()
+				img, err := processImage(byteContainer, size)
+				if err != nil {
+					log.Println(err)
+					results <- img
+					continue
+				}
+				log.Println("Processed image in", time.Since(start), " | The size requested was", size)
+				results <- img
+			}
+		}()
+	}
 
 	for _, size := range sizes {
-		go func(size string) {
-			start := time.Now()
-			img, err := processImage(byteContainer, size)
-			if err != nil {
-				log.Println(err)
-				ch <- img
-				return
-			}
-			log.Println("Processed image in", time.Since(start), " | The size requested was", size)
-			ch <- img
-		}(size)
+		jobs <- size
 	}
+	close(jobs)
+
+	var images []Image
 
 	for i := 0; i < len(sizes); i++ {
-		images = append(images, <-ch)
+		img := <-results
+		if img.Base64 == "" {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(AverageResponse{Message: "Something went wrong while trying to process the image.", Error: true})
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		images = append(images, img)
 	}
-
-	close(ch)
 
 	// return the images array as json
 	w.Header().Set("Content-Type", "application/json")
