@@ -50,6 +50,6 @@ func processImage(byteContainer []byte, size string, quality int) (Image, error)
 		return Image{}, err
 	}
 
-	encoded := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(compression))
+	encoded := fmt.Sprintf("data:image/webp;base64,%s", base64.StdEncoding.EncodeToString(compression))
 	return Image{Size: size, Base64: encoded}, nil
 }
